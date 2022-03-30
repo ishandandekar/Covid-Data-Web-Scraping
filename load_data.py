@@ -2,15 +2,7 @@ import imp
 import pandas as pd
 from bs4 import BeautifulSoup
 import requests
-
-
-def comma_remover(col_name):
-    result = []
-    for num in df[col_name]:
-        result.append(num.replace(',', ''))
-    df[col_name] = result
-    df[col_name] = pd.to_numeric(
-        df[col_name], errors='coerce', downcast='integer')
+import numpy as np
 
 
 def load_data():
@@ -56,10 +48,18 @@ def load_data():
                   "ActiveCases": ActiveCases_data, "CriticalCases": CriticalCases_data, "Totcase1M": Totcase1M_data, "Totdeath1M": Totdeath1M_data, "TotalTests": TotalTests_data, "Tottest1M": Tottest1M_data, "Population": Population_data}
     df = pd.DataFrame(table_dict)
     df = df.loc[8:, :]
+
+    def comma_remover(col_name):
+        result = []
+        for num in df[col_name]:
+            result.append(num.replace(',', ''))
+        df[col_name] = result
+        df[col_name] = pd.to_numeric(
+            df[col_name], errors='coerce', downcast='integer')
     for col in df.columns[1:]:
         comma_remover(col)
-        df[col] = df[col].fillna(0)
-    return df
+        df[col] = df[col].fillna(np.nan)
+    return df.reset_index(drop=True)
 
 
 if __name__ == '__main__':
